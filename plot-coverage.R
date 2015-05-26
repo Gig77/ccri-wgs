@@ -15,7 +15,7 @@ opt <- parse_args(OptionParser(option_list=option_list))
 # find *.bam | parallel 'bedtools -abam {} -b capture.bed -hist | grep ^all > {}.all.txt'
 
 # Get a list of the bedtools output files you'd like to read in
-files <- list.files(path="~/wgs/results", pattern=paste0(opt$'filename-suffix', '$'))
+files <- list.files(path="/mnt/projects/wgs/results", pattern=paste0(opt$'filename-suffix', '$'))
 labs <- sapply(strsplit(files, ".", fixed=T), "[[", 1) # extract sample name from file name
 
 # Create lists to hold coverage and cumulative coverage for each alignment,
@@ -24,7 +24,7 @@ cov <- list()
 cov_cumul <- list()
 means <- numeric(0)
 for (i in 1:length(files)) {
-	cov[[i]] <- read.table(paste0("~/wgs/results/", files[i]))
+	cov[[i]] <- read.table(paste0("/mnt/projects/wgs/results/", files[i]))
 	cov_cumul[[i]] <- 1-cumsum(cov[[i]][,5])
 	means[i] <- cov_cumul[[i]][opt$'sort-point']
 }

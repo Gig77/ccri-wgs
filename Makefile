@@ -20,8 +20,8 @@ all: coverage-read.pdf coverage-fragment.pdf fastqc picard flagstat
 #--- READ COVERAGE
 #---
 
-coverage-read.pdf: $(foreach S, $(SAMPLES), $S.bedtools-genomecov.reads.txt) ~/wgs/scripts/plot-coverage.R
-	Rscript ~/wgs/scripts/plot-coverage.R \
+coverage-read.pdf: $(foreach S, $(SAMPLES), $S.bedtools-genomecov.reads.txt) /mnt/projects/wgs/scripts/plot-coverage.R
+	Rscript /mnt/projects/wgs/scripts/plot-coverage.R \
 		--filename-suffix .bedtools-genomecov.reads.txt \
 		--title-1 "Coverage" \
 		--title-2 "Cumulative coverage" \
@@ -32,7 +32,7 @@ coverage-read.pdf: $(foreach S, $(SAMPLES), $S.bedtools-genomecov.reads.txt) ~/w
 	mv coverage-read.pdf.part coverage-read.pdf
 	mv coverage-read.png.part coverage-read.png
 
-%.bedtools-genomecov.reads.txt: ~/wgs/data/bam/variant_calling_process_lane_SET_53_C248CACXX_%_recalibrated.bam
+%.bedtools-genomecov.reads.txt: /mnt/projects/wgs/data/bam/variant_calling_process_lane_SET_53_C248CACXX_%_recalibrated.bam
 	~/tools/samtools-0.1.19/samtools view -b -f 2 -F 1792 -q 1 $< 20 \
 		| ~/tools/bedtools-2.17.0/bin/bedtools genomecov \
 			-ibam stdin \
@@ -45,8 +45,8 @@ coverage-read.pdf: $(foreach S, $(SAMPLES), $S.bedtools-genomecov.reads.txt) ~/w
 #--- FRAGMENT COVERAGE
 #---
 
-coverage-fragment.pdf: $(foreach S, $(SAMPLES), $S.bedtools-genomecov.fragments.txt) ~/wgs/scripts/plot-coverage.R
-	Rscript ~/wgs/scripts/plot-coverage.R \
+coverage-fragment.pdf: $(foreach S, $(SAMPLES), $S.bedtools-genomecov.fragments.txt) /mnt/projects/wgs/scripts/plot-coverage.R
+	Rscript /mnt/projects/wgs/scripts/plot-coverage.R \
 		--filename-suffix .bedtools-genomecov.fragments.txt \
 		--title-1 "Physical (fragment) coverage" \
 		--title-2 "Cumulative physical (fragment) coverage" \
@@ -57,7 +57,7 @@ coverage-fragment.pdf: $(foreach S, $(SAMPLES), $S.bedtools-genomecov.fragments.
 	mv coverage-fragment.pdf.part coverage-fragment.pdf
 	mv coverage-fragment.png.part coverage-fragment.png
 	
-%.bedtools-genomecov.fragments.txt: ~/wgs/data/bam/variant_calling_process_lane_SET_53_C248CACXX_%_recalibrated.bam
+%.bedtools-genomecov.fragments.txt: /mnt/projects/wgs/data/bam/variant_calling_process_lane_SET_53_C248CACXX_%_recalibrated.bam
 	~/tools/samtools-0.1.19/samtools sort -@ 10 -no <(~/tools/samtools-0.1.19/samtools view -bh -f 2 -F 1792 -q 1 $< 20) bla \
 		| ~/tools/bedtools-2.17.0/bin/bamToBed -i stdin -bedpe \
 		| cut -f 1,2,6 \
@@ -76,7 +76,7 @@ coverage-fragment.pdf: $(foreach S, $(SAMPLES), $S.bedtools-genomecov.fragments.
 .PHONY: fastqc
 fastqc: $(foreach S, $(SAMPLES), fastqc/$S_fastqc.html)
 	
-fastqc/%_fastqc.html: ~/wgs/data/bam/variant_calling_process_lane_SET_53_C248CACXX_%_recalibrated.bam
+fastqc/%_fastqc.html: /mnt/projects/wgs/data/bam/variant_calling_process_lane_SET_53_C248CACXX_%_recalibrated.bam
 	mkdir -p fastqc/$*.part
 	~/tools/FastQC/fastqc --outdir fastqc/$*.part --threads 5 $<
 	mv fastqc/$*.part/* fastqc
@@ -88,7 +88,7 @@ fastqc/%_fastqc.html: ~/wgs/data/bam/variant_calling_process_lane_SET_53_C248CAC
 .PHONY: picard
 picard: $(foreach S, $(SAMPLES), picard/$S.chr20.picard.insertsize.out)
 
-picard/%.chr20.picard.insertsize.out: ~/wgs/data/bam/variant_calling_process_lane_SET_53_C248CACXX_%_recalibrated.bam ~/tools/picard-tools-1.114/CollectInsertSizeMetrics.jar
+picard/%.chr20.picard.insertsize.out: /mnt/projects/wgs/data/bam/variant_calling_process_lane_SET_53_C248CACXX_%_recalibrated.bam ~/tools/picard-tools-1.114/CollectInsertSizeMetrics.jar
 	mkdir -p picard
 	java -jar ~/tools/picard-tools-1.114/CollectInsertSizeMetrics.jar \
 		INPUT=<(~/tools/samtools-0.1.19/samtools view -bh -f 2 -F 1792 -q 1 $< 20) \
@@ -102,7 +102,7 @@ picard/%.chr20.picard.insertsize.out: ~/wgs/data/bam/variant_calling_process_lan
 #---
 .PHONY: flagstat
 flagstat: $(foreach S, $(SAMPLES), flagstat/$S.chr20.samtools.flagstat)
-flagstat/%.chr20.samtools.flagstat: ~/wgs/data/bam/variant_calling_process_lane_SET_53_C248CACXX_%_recalibrated.bam
+flagstat/%.chr20.samtools.flagstat: /mnt/projects/wgs/data/bam/variant_calling_process_lane_SET_53_C248CACXX_%_recalibrated.bam
 	mkdir -p flagstat
 	~/tools/samtools-0.1.19/samtools flagstat <(~/tools/samtools-0.1.19/samtools view -bh -f 2 -F 1792 -q 1 $< 20) 2>&1 1>$@.part | $(LOG)
 	mv $@.part $@
