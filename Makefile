@@ -34,7 +34,7 @@ coverage-read.pdf: $(foreach S, $(SAMPLES), $S.bedtools-genomecov.reads.txt) /mn
 
 %.bedtools-genomecov.reads.txt: /mnt/projects/wgs/data/bam/variant_calling_process_lane_SET_53_C248CACXX_%_recalibrated.bam
 	~/tools/samtools-0.1.19/samtools view -b -f 2 -F 1792 -q 1 $< 20 \
-		| ~/tools/bedtools-2.17.0/bin/bedtools genomecov \
+		| /data_synology/software/bedtools-2.17.0/bin/bedtools genomecov \
 			-ibam stdin \
 			-g <(echo -e "20\t59505520\n") \
 		| grep ^20 \
@@ -59,10 +59,10 @@ coverage-fragment.pdf: $(foreach S, $(SAMPLES), $S.bedtools-genomecov.fragments.
 	
 %.bedtools-genomecov.fragments.txt: /mnt/projects/wgs/data/bam/variant_calling_process_lane_SET_53_C248CACXX_%_recalibrated.bam
 	~/tools/samtools-0.1.19/samtools sort -@ 10 -no <(~/tools/samtools-0.1.19/samtools view -bh -f 2 -F 1792 -q 1 $< 20) bla \
-		| ~/tools/bedtools-2.17.0/bin/bamToBed -i stdin -bedpe \
+		| /data_synology/software/bedtools-2.17.0/bin/bamToBed -i stdin -bedpe \
 		| cut -f 1,2,6 \
 		| sort -k 1,1 \
-		| ~/tools/bedtools-2.17.0/bin/bedtools genomecov \
+		| /data_synology/software/bedtools-2.17.0/bin/bedtools genomecov \
 			-i stdin \
 			-g <(echo -e "20\t59505520\n") \
 		| grep ^20 \
@@ -78,7 +78,7 @@ fastqc: $(foreach S, $(SAMPLES), fastqc/$S_fastqc.html)
 	
 fastqc/%_fastqc.html: /mnt/projects/wgs/data/bam/variant_calling_process_lane_SET_53_C248CACXX_%_recalibrated.bam
 	mkdir -p fastqc/$*.part
-	~/tools/FastQC/fastqc --outdir fastqc/$*.part --threads 5 $<
+	/data_synology/software/FastQC-0.11.2/fastqc --outdir fastqc/$*.part --threads 5 $<
 	mv fastqc/$*.part/* fastqc
 	rmdir fastqc/$*.part
 
